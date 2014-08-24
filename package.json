@@ -1,0 +1,29 @@
+{
+  "name": "iconise",
+  "version": "1.1.0",
+  "description": "Convert svgs to fonticons with stylus mixin mappings",
+  "main": "iconise.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/iamalarner/iconise.git"
+  },
+  "keywords": [
+    "fonticons"
+  ],
+  "author": "Matt Larner <matt.larner.dev@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/iamalarner/iconise/issues"
+  },
+  "bin": {
+    "iconise": "./iconise.js"
+  },
+  "homepage": "https://github.com/iamalarner/iconise",
+  "dependencies": {
+    "kgo": "^1.1.3",
+    "minimist": "^1.1.0"
+  }
+}
