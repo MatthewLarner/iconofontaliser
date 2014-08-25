@@ -11,9 +11,8 @@ var options = require('minimist')(process.argv.slice(2)),
     fs = require('fs');
 
 function getFonts(fontFamily){
-    console.log(path.relative(buildPath, fontPath) + '/' + fontFamily + '.woff')
     var fonts = [];
-    glob(fontPath + '/' + fontFamily + '.woff', {sync:true}, function(error, files) {
+    glob(fontPath + '/' + fontFamily + '.*', {sync:true}, function(error, files) {
         fonts = files;
     });
     return fonts;
