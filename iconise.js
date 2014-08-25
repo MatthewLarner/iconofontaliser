@@ -2,20 +2,27 @@
 
 var options = require('minimist')(process.argv.slice(2)),
     kgo = require('kgo'),
-    config = options.c || options.config ||  options._[0],
+    fontPath = options.f || options.fontPath || options._[0],
     output = options.o || options.output || options._[1],
-    fontPath = options.f || options.fontPath || options._[2],
+    config = options.c || options.config ||  options._[2],
+    buildPath = options.b || options.buildPath || options._[3],
     path = require('path'),
+    glob = require('glob'),
     fs = require('fs');
 
-function getFonts(){
-    return fs.readdirSync(fontPath);
+function getFonts(fontFamily){
+    console.log(path.relative(buildPath, fontPath) + '/' + fontFamily + '.woff')
+    var fonts = [];
+    glob(fontPath + '/' + fontFamily + '.woff', {sync:true}, function(error, files) {
+        fonts = files;
+    });
+    return fonts;
 }
 
 function fontSrcStatement(result, statement, index, fontSrc) {
-    return result + 
-        'url(\'' + statement.url + '\') ' + 
-        'format(\'' + statement.format + '\')' + 
+    return result +
+        'url(\'' + statement.url + '\') ' +
+        'format(\'' + statement.format + '\')' +
         (index === fontSrc.length-1 ? ';' : ', ');
 }
 
@@ -23,28 +30,29 @@ function renderFontSrc(fontSrc) {
     return fontSrc.reduce(fontSrcStatement, '');
 }
 
-function createFontSrc() {
+function createFontSrc(fontFamily) {
     var fontSrc = [];
-    var fonts = getFonts();
+    var fonts = getFonts(fontFamily);
     for (var i=0; i < fonts.length; i++) {
         fontSrc.push({
-            url: fontPath + fonts[i],
+            url: path.relative(buildPath, fontPath) + '/' + path.basename(fonts[i]),
             format: path.extname(fonts[i]).slice(1)
         });
     }
     return fontSrc;
 }
 
-function renderFontFaces(fontFaces){
-    return '@font-face {\n'+
-                renderFontSrc(createFontSrc()) + '\n' +
-            '    font-weight: normal + \n' +
+function renderFontFaces(fontFamily){
+    return '@font-face {\n' +
+            '    font-family: \'' + fontFamily + '\';\n' +
+            '    src: ' + renderFontSrc(createFontSrc(fontFamily)) + '\n' +
+            '    font-weight: normal;\n' +
             '    font-style: normal;\n' +
             '}';
 }
 
 function renderCharCode(result, charCode) {
-    return result + path.basename(charCode.file) + ' = ' + charCode.unicode + ';\n';
+    return result + charCode.file.slice(0, -4) + ' = "' + charCode.unicode + '";\n';
 }
 
 
@@ -77,7 +85,7 @@ function renderIconStyle(fontFamily) {
 function render(config) {
     var result = '';
 
-    result += renderFontFaces();
+    result += renderFontFaces(config.id);
 
     result += '\n\n';
 
